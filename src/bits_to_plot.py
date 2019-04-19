@@ -3,8 +3,9 @@ import numpy as np
 from typing import List
 from datetime import datetime
 
+
 def bits_to_int_list(bits: str) -> List[int]:
-    """Bits to list representation
+    """
     Ex:
         1010100 -> [1, 0, 1, 0, 1, 0, 0]
     """
@@ -49,19 +50,22 @@ def manchester(bits: str, convention: str = "thomas") -> None:
     encoding, ca use the Thomas or IEEE convention"""
     bits = bits_to_int_list(bits)
 
+    up_transition = [-1, 1]
+    down_transition = [1, -1]
+
     if convention == 'thomas':
-        positive, negative = 1, -1
+        one, zero = down_transition, up_transition
     elif convention == "ieee":
-        positive, negative = -1, 1
+        one, zero = up_transition, down_transition
     else:
         raise ValueError(f"Convention {convention} does not exist")
 
     signal = []
     for bit in bits:
         if bit:
-            signal += [positive, negative]
+            signal += one
         else:
-            signal += [negative, positive]
+            signal += zero
 
     signal = [0]*3 + signal
     make_graph(signal, bits, f"{convention.upper()} Manchester Representation")
@@ -174,19 +178,5 @@ def hdb3(bits: str, initial_state: int = -1) -> None:
     title = "HDB3 Representation"
     make_graph(signal, bits, title)
 
-number = "00000000011001100001"
-manchester(number)
-manchester(number, convention="ieee")
-d_manchester(number, initial_state=-1)
-d_manchester(number, initial_state=1)
-d_manchester(number, alternate=True, initial_state=-1)
-d_manchester(number, alternate=True, initial_state=1)
-b8zs(number, initial_state=1)
-b8zs(number, initial_state=-1)
-hdb3(number, initial_state=1)
-hdb3(number, initial_state=-1)
-
-
-
-
-
+manchester("10000111")
+manchester("10000111", convention="ieee")
