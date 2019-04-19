@@ -20,6 +20,7 @@ def make_graph(signal: List[int], bits: List[int], title: str) -> None:
     plt.axhline(y=0, **features)
 
     bits = ["State"] + bits
+    print(len(bits), len(signal))
     # vertical lines
     ratio = len(signal)//len(bits)
     vertical_lines_coordinates = np.arange(0, len(signal), ratio)
@@ -151,7 +152,6 @@ def hdb3(bits: str, initial_state: int = -1) -> None:
                 if is_count_one_even and is_preceding_pulse_positive:
                     change = [-1, 0, 0]
                     to_add = -1
-                    signal.append(-1)
                 elif is_count_one_even and not is_preceding_pulse_positive:
                     change = [1, 0, 0]
                     to_add = 1
