@@ -47,7 +47,7 @@ def make_graph(signal: List[int], bits: List[int], title: str) -> None:
 
 def manchester(bits: str, convention: str = "thomas") -> None:
     """Plots the graphical representation of the signal with the manchester
-    encoding, ca use the Thomas or IEEE convention"""
+    encoding, can use both Thomas or IEEE convention"""
     bits = bits_to_int_list(bits)
 
     up_transition = [-1, 1]
@@ -71,27 +71,26 @@ def manchester(bits: str, convention: str = "thomas") -> None:
     make_graph(signal, bits, f"{convention.upper()} Manchester Representation")
 
 
-def d_manchester(bits: str, alternate: bool = False, initial_state=-1) -> None:
+def d_manchester(bits: str, initial_state=-1) -> None:
     """Plots the graphical representation of the signal with the differential
-    manchester encoding, cna use the default or the alternate convention"""
+    manchester encoding"""
     bits = bits_to_int_list(bits)
 
     signal = []
     state = initial_state
 
     for bit in bits:
-        if bit != alternate:
-            signal.append(state * -1)
-            signal.append(state)
-        else:
+        if bit:
             signal.append(state)
             state *= -1
+            signal.append(state)
+        else:
+            signal.append(state * -1)
             signal.append(state)
 
     signal = [initial_state]*3 + signal
 
-    alternate_string = "Aternate " if alternate else ""
-    title = f"{alternate_string}Differential Manchester Representation"
+    title = "Differential Manchester Representation"
     make_graph(signal, bits, title)
 
 
@@ -103,13 +102,13 @@ def b8zs(bits:str, initial_state: int = -1) -> None:
     signal = []
     state = initial_state
 
-    count_zero = 1 if state == 0 else 0
-    for index in range(len(bits)):
-        if bits[index]:
+    count_zero = 0
+    for bit in bits:
+        if bit == 1:
             state *= -1
             signal.append(state)
             count_zero = 0
-        else:
+        elif bit == 0:
             count_zero += 1
             if count_zero == 8:
                 count_zero = 0
@@ -180,14 +179,10 @@ def hdb3(bits: str, initial_state: int = -1) -> None:
     make_graph(signal, bits, title)
 
 
-number = "0101011110101010101101010"
-manchester(number)
-manchester(number, convention="ieee")
-d_manchester(number, initial_state=1, alternate=False)
-d_manchester(number, initial_state=1, alternate=True)
-d_manchester(number, initial_state=-1, alternate=False)
-d_manchester(number, initial_state=-1, alternate=True)
-b8zs(number, initial_state=1)
-b8zs(number, initial_state=-1)
-hdb3(number, initial_state=1)
-hdb3(number, initial_state=-1)
+
+
+
+number = "10000111"
+
+d_manchester(number, initial_state=-1)
+d_manchester(number, initial_state=1)
