@@ -94,7 +94,7 @@ def d_manchester(bits: str, initial_state=-1) -> None:
     make_graph(signal, bits, title)
 
 
-def b8zs(bits:str, initial_state: int = -1) -> None:
+def b8zs(bits: str, initial_state: int = -1) -> None:
     """Plots the graphical representation of the signal with the binary eight
     zero suppress encodings, can change the initial state to 0 or 1"""
     bits = bits_to_int_list(bits)
@@ -111,12 +111,9 @@ def b8zs(bits:str, initial_state: int = -1) -> None:
         elif bit == 0:
             count_zero += 1
             if count_zero == 8:
-                count_zero = 0
-                signal[-4] = state
-                signal[-3] = state * -1
-                signal[-2] = 0
-                signal[-1] = state * -1
+                signal[-4:] = [state, state*-1, 0, state*-1]
                 signal.append(state)
+                count_zero = 0
             else:
                 signal.append(0)
 
@@ -178,11 +175,13 @@ def hdb3(bits: str, initial_state: int = -1) -> None:
     title = "HDB3 Representation"
     make_graph(signal, bits, title)
 
+number = "0000000001100110000"
 
-
-
-
-number = "10000111"
-
-d_manchester(number, initial_state=-1)
+manchester(number)
+manchester(number, convention="ieee")
 d_manchester(number, initial_state=1)
+d_manchester(number, initial_state=-1)
+b8zs(number, initial_state=1)
+b8zs(number, initial_state=-1)
+hdb3(number, initial_state=-1)
+hdb3(number, initial_state=-1)
