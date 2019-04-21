@@ -127,7 +127,23 @@ def is_even(number: int):
     return number % 2 == 0
 
 
-def hdb3(bits: str, initial_state: int = -1) -> None:
+def four_zeros_substitution(count_pulses: int, state: int) -> List[int]:
+    """returns the modified values based on the table rule of hdb3"""
+
+    count_pulses_even = (count_pulses % 2 == 0)
+    state_positive = (state == 1)
+    if count_pulses_even and state_positive:
+        modified = [-1, 0, 0, -1]
+    elif count_pulses_even and not state_positive:
+        modified = [1, 0, 0, 1]
+    elif not count_pulses_even and state_positive:
+        modified = [0, 0, 0, 1]
+    else:
+        modified = [0, 0, 0, -1]
+    return modified
+
+
+def hdb3(bits: str, initial_state: int) -> None:
     """Plots the graphical representation of the signal with the HDB3 encoding,
      can change the initial state to 0 or 1"""
     bits = bits_to_int_list(bits)
@@ -136,52 +152,37 @@ def hdb3(bits: str, initial_state: int = -1) -> None:
     state = initial_state
 
     count_zero = 0
-    count_one_since_last_substitution = 1  # because of state
-    preceding_pulse = state
-    for index in range(len(bits)):
-        if bits[index]:
+    count_one = 1  # because of state
+
+    for bit in bits:
+
+        if bit == 1:
             state *= -1
             signal.append(state)
-            count_one_since_last_substitution += 1
-            preceding_pulse = state
+            count_one += 1
             count_zero = 0
-        else:
+
+        elif bit == 0:
             count_zero += 1
+            signal.append(0)
+
             if count_zero == 4:
-                is_count_one_even = count_one_since_last_substitution % 2 == 0
-                is_preceding_pulse_positive = preceding_pulse == 1
-                if is_count_one_even and is_preceding_pulse_positive:
-                    change = [-1, 0, 0]
-                    to_add = -1
-                elif is_count_one_even and not is_preceding_pulse_positive:
-                    change = [1, 0, 0]
-                    to_add = 1
-                elif not is_count_one_even and is_preceding_pulse_positive:
-                    change = [0, 0, 0]
-                    to_add = 1
-                else:
-                    change = [0, 0, 0]
-                    to_add = -1
-                signal[-3:] = change.copy()
-                signal.append(to_add)
+                signal[-4:] = four_zeros_substitution(count_one, state)
                 state = signal[-1]
-                count_one_since_last_substitution = 0
-                preceding_pulse = state
+                count_one = 0
                 count_zero = 0
-            else:
-                signal.append(0)
 
     signal = [initial_state]*2 + signal
     title = "HDB3 Representation"
     make_graph(signal, bits, title)
 
-number = "0000000001100110000"
+number = "0000000011000010000"
 
-manchester(number)
-manchester(number, convention="ieee")
-d_manchester(number, initial_state=1)
-d_manchester(number, initial_state=-1)
-b8zs(number, initial_state=1)
-b8zs(number, initial_state=-1)
+#manchester(number)
+#manchester(number, convention="ieee")
+#d_manchester(number, initial_state=1)
+#d_manchester(number, initial_state=-1)
+#b8zs(number, initial_state=1)
+#b8zs(number, initial_state=-1)
 hdb3(number, initial_state=-1)
-hdb3(number, initial_state=-1)
+hdb3(number, initial_state=1)
