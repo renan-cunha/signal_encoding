@@ -102,6 +102,8 @@ def b8zs(bits: str, initial_state: int = -1) -> None:
     signal = []
     state = initial_state
 
+
+
     count_zero = 0
     for bit in bits:
         if bit == 1:
@@ -109,13 +111,11 @@ def b8zs(bits: str, initial_state: int = -1) -> None:
             signal.append(state)
             count_zero = 0
         elif bit == 0:
+            signal.append(0)
             count_zero += 1
             if count_zero == 8:
-                signal[-4:] = [state, state*-1, 0, state*-1]
-                signal.append(state)
+                signal[-4:] = [state, state*-1, 0, state*-1, state]
                 count_zero = 0
-            else:
-                signal.append(0)
 
     signal = [initial_state]*2 + signal
     title = "B8ZS representation"
@@ -176,13 +176,13 @@ def hdb3(bits: str, initial_state: int) -> None:
     title = "HDB3 Representation"
     make_graph(signal, bits, title)
 
-number = "0000000011000010000"
+number = "110000000010"
 
 #manchester(number)
 #manchester(number, convention="ieee")
 #d_manchester(number, initial_state=1)
 #d_manchester(number, initial_state=-1)
-#b8zs(number, initial_state=1)
-#b8zs(number, initial_state=-1)
-hdb3(number, initial_state=-1)
-hdb3(number, initial_state=1)
+b8zs(number, initial_state=1)
+b8zs(number, initial_state=-1)
+#hdb3(number, initial_state=-1)
+#hdb3(number, initial_state=1)
