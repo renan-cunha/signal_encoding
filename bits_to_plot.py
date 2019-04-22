@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from typing import List
-from datetime import datetime
 
 
 def bits_to_int_list(bits: str) -> List[int]:
@@ -20,7 +19,7 @@ def make_graph(signal: List[int], bits: List[int], title: str) -> None:
     features = {'color': 'gray', 'linewidth': 0.4}
     plt.axhline(y=0, **features)
 
-    bits = ["State"] + bits
+    bits = ["phase"] + bits
     print(len(bits), len(signal))
     # vertical lines
     ratio = len(signal)//len(bits)
@@ -41,7 +40,6 @@ def make_graph(signal: List[int], bits: List[int], title: str) -> None:
 
     plt.title(title)
 
-    plt.savefig(f"{datetime.now().isoformat()}.png")
     plt.show()
 
 
@@ -77,16 +75,16 @@ def d_manchester(bits: str, initial_state=-1) -> None:
     bits = bits_to_int_list(bits)
 
     signal = []
-    state = initial_state
+    phase = initial_state
 
     for bit in bits:
         if bit:
-            signal.append(state)
-            state *= -1
-            signal.append(state)
+            signal.append(phase)
+            phase *= -1
+            signal.append(phase)
         else:
-            signal.append(state * -1)
-            signal.append(state)
+            signal.append(phase * -1)
+            signal.append(phase)
 
     signal = [initial_state]*3 + signal
 
@@ -96,23 +94,23 @@ def d_manchester(bits: str, initial_state=-1) -> None:
 
 def b8zs(bits: str, initial_state: int = -1) -> None:
     """Plots the graphical representation of the signal with the binary eight
-    zero suppress encodings, can change the initial state to 0 or 1"""
+    zero suppress encodings, can change the initial phase to 0 or 1"""
     bits = bits_to_int_list(bits)
 
     signal = []
-    state = initial_state
+    phase = initial_state
 
     count_zero = 0
     for bit in bits:
         if bit == 1:
-            state *= -1
-            signal.append(state)
+            phase *= -1
+            signal.append(phase)
             count_zero = 0
         elif bit == 0:
             signal.append(0)
             count_zero += 1
             if count_zero == 8:
-                signal[-5:] = [state, state*-1, 0, state*-1, state]
+                signal[-5:] = [phase, phase*-1, 0, phase*-1, phase]
                 count_zero = 0
 
     signal = [initial_state]*2 + signal
@@ -125,11 +123,11 @@ def is_even(number: int):
     return number % 2 == 0
 
 
-def four_zeros_substitution(count_pulses: int, state: int) -> List[int]:
+def four_zeros_substitution(count_pulses: int, phase: int) -> List[int]:
     """returns the modified values based on the table rule of hdb3"""
 
     count_pulses_even = (count_pulses % 2 == 0)
-    state_positive = (state == 1)
+    state_positive = (phase == 1)
     if count_pulses_even and state_positive:
         modified = [-1, 0, 0, -1]
     elif count_pulses_even and not state_positive:
@@ -143,20 +141,20 @@ def four_zeros_substitution(count_pulses: int, state: int) -> List[int]:
 
 def hdb3(bits: str, initial_state: int) -> None:
     """Plots the graphical representation of the signal with the HDB3 encoding,
-     can change the initial state to 0 or 1"""
+     can change the initial phase to 0 or 1"""
     bits = bits_to_int_list(bits)
 
     signal = []
-    state = initial_state
+    phase = initial_state
 
     count_zero = 0
-    count_pulses = 1  # because of state
+    count_pulses = 1  # because of phase
 
     for bit in bits:
 
         if bit == 1:
-            state *= -1
-            signal.append(state)
+            phase *= -1
+            signal.append(phase)
             count_pulses += 1
             count_zero = 0
 
@@ -165,22 +163,11 @@ def hdb3(bits: str, initial_state: int) -> None:
             signal.append(0)
 
             if count_zero == 4:
-                signal[-4:] = four_zeros_substitution(count_pulses, state)
-                state = signal[-1]
+                signal[-4:] = four_zeros_substitution(count_pulses, phase)
+                phase = signal[-1]
                 count_pulses = 0
                 count_zero = 0
 
     signal = [initial_state]*2 + signal
     title = "HDB3 Representation"
     make_graph(signal, bits, title)
-
-number = "0000000011000010000"
-
-#manchester(number)
-#manchester(number, convention="ieee")
-#d_manchester(number, initial_state=1)
-#d_manchester(number, initial_state=-1)
-#b8zs(number, initial_state=1)
-#b8zs(number, initial_state=-1)
-hdb3(number, initial_state=-1)
-hdb3(number, initial_state=1)
